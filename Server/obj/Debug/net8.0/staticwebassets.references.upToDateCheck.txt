@@ -1,0 +1,4 @@
+P:\Dev\NDALogin\Client\obj\Debug\net8.0\staticwebassets.build.json
+P:\Dev\NDALogin\Client\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\ssingh\Desktop\test\TextingNotification\notification\Client\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\ssingh\Desktop\test\TextingNotification\notification\Client\obj\Debug\net8.0\staticwebassets.build.json

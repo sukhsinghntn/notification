@@ -1,0 +1,53 @@
+@page "/sms"
+@using NDAProcesses.Shared.Models
+@inject ISmsService SmsService
+@inject CookieHelper CookieHelper
+@inject NavigationManager NavigationManager
+@inject Radzen.NotificationService NotificationService
+
+<RadzenTemplateForm Data="@message" TItem="SmsMessage" Submit="@SendAsync">
+    <RadzenCard Style="max-width:400px;margin:auto;margin-top:100px;">
+        <RadzenText Text="Send Message" TextStyle="Radzen.Blazor.TextStyle.DisplayH4" Style="text-align:center" />
+        <RadzenFieldset Style="border:none">
+            <RadzenLabel Text="Phone Number" Component="Phone" />
+            <RadzenTextBox @bind-Value="message.PhoneNumber" Name="Phone" Style="width:100%" />
+            <RadzenLabel Text="Message" Component="Body" />
+            <RadzenTextArea @bind-Value="message.Message" Name="Body" Style="width:100%" Rows="4" />
+        </RadzenFieldset>
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Send" Style="width:100%" IsBusy="@busy" />
+    </RadzenCard>
+</RadzenTemplateForm>
+
+@code {
+    private SmsMessage message = new();
+    private bool busy;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var user = await CookieHelper.LoginStatus();
+            if (string.IsNullOrEmpty(user))
+            {
+                var returnUrl = Uri.EscapeDataString(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
+                NavigationManager.NavigateTo($"login?returnUrl={returnUrl}", true);
+            }
+        }
+    }
+
+    private async Task SendAsync()
+    {
+        busy = true;
+        var success = await SmsService.SendSms(message);
+        busy = false;
+        if (success)
+        {
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Message sent" });
+            message = new();
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Failed to send" });
+        }
+    }
+}
